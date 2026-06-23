@@ -12,9 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
 
-        // Tambahkan baris ini untuk mendaftarkan middleware CheckRole
+        // 1. Daftarkan alias 'role' di sini agar error-nya hilang
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
+
+        // 2. Ini satpam pelacak waktu yang sudah kamu tambahkan
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackUserActivity::class,
         ]);
 
     })

@@ -27,33 +27,54 @@
             @forelse ($animals as $animal)
                 <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
                     <div class="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
-                        <img src="{{ asset('storage/' . $animal->image_path) }}" alt="{{ $animal->name }}" class="w-full h-full object-cover">
+                        <img src="{{ asset($animal->image_path) }}" alt="{{ $animal->name }}" class="w-full h-full object-cover">
                     </div>
 
                     <div class="p-4">
                         <h3 class="font-bold text-lg mb-1 text-gray-900 leading-tight">{{ $animal->name }}</h3>
+
+                        <div class="mb-3 mt-1">
+                            @if($animal->is_public)
+                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-green-400">
+                                    Tersedia
+                                </span>
+                            @else
+                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-red-400">
+                                    Kosong
+                                </span>
+                            @endif
+                        </div>
+
                         <p class="text-gray-600 text-xs mb-1"><strong>Jenis:</strong> {{ $animal->species }} ({{ $animal->gender }})</p>
                         <p class="text-gray-600 text-xs mb-1"><strong>Usia:</strong> {{ $animal->estimated_age }} | <strong>Berat:</strong> {{ $animal->weight }} Kg</p>
                         <p class="text-green-600 font-bold text-lg mt-2">Rp {{ number_format($animal->price, 0, ',', '.') }}</p>
 
-                        <p class="text-gray-500 text-xs mt-2 border-t pt-2">
+                        <p class="text-gray-700 text-sm mt-2 italic" title="{{ $animal->description }}">
+                            "{{ \Illuminate\Support\Str::limit($animal->description, 60, '...') }}"
+                        </p>
+
+                        <p class="text-gray-500 text-xs mt-3 border-t pt-2">
                             Penjual: <strong>{{ $animal->user->name }}</strong>
                         </p>
 
                         <div class="mt-4">
-                            @php
-                                // Logika untuk memperbaiki format nomor WA (jika diinput 08, diubah jadi 62)
-                                $wa = $animal->user->whatsapp_number;
-                                if(substr($wa, 0, 1) == '0'){
-                                    $wa = '62' . substr($wa, 1);
-                                }
-                                // Teks otomatis untuk pesan WhatsApp
-                                $pesan = "Halo " . $animal->user->name . ", saya tertarik dengan " . $animal->name . " yang Anda jual dengan harga Rp " . number_format($animal->price, 0, ',', '.') . ". Apakah masih tersedia?";
-                            @endphp
+                            @if($animal->is_public)
+                                @php
+                                    $wa = $animal->user->whatsapp_number;
+                                    if(substr($wa, 0, 1) == '0'){
+                                        $wa = '62' . substr($wa, 1);
+                                    }
+                                    $pesan = "Halo " . $animal->user->name . ", saya tertarik dengan " . $animal->name . " yang Anda jual dengan harga Rp " . number_format($animal->price, 0, ',', '.') . ". Apakah masih tersedia?";
+                                @endphp
 
-                            <a href="https://wa.me/{{ $wa }}?text={{ urlencode($pesan) }}" target="_blank" class="block w-full bg-green-500 hover:bg-green-600 text-white text-center px-4 py-2 rounded text-sm font-bold transition">
-                                Hubungi Penjual (WhatsApp)
-                            </a>
+                                <a href="https://wa.me/{{ $wa }}?text={{ urlencode($pesan) }}" target="_blank" class="block w-full bg-green-500 hover:bg-green-600 text-white text-center px-4 py-2 rounded text-sm font-bold transition">
+                                    Hubungi Penjual (WhatsApp)
+                                </a>
+                            @else
+                                <button disabled class="block w-full bg-gray-300 text-gray-500 text-center px-4 py-2 rounded text-sm font-bold cursor-not-allowed">
+                                    Tidak Tersedia
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>

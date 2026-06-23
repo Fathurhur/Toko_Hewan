@@ -31,12 +31,20 @@ Route::middleware('auth')->group(function () {
     // 4. DASHBOARD ADMIN
     // -----------------------------------------------------
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+
         Route::get('/dashboard', function () {
-            return view('admin.dashboard');
+            // Hanya mengambil data Hewan dan Pedagang saja
+            $animals = \App\Models\Animal::with('user')->latest()->get();
+            $sellers = \App\Models\User::where('role', 'user')->latest()->get();
+
+            return view('admin.dashboard', compact('animals', 'sellers'));
         })->name('dashboard');
 
         Route::resource('animals', AnimalController::class);
+
+        // Rute kelola admin pembantu sudah dihapus dari sini
     });
+
 
     // -----------------------------------------------------
     // 5. DASHBOARD USER (PENJUAL)

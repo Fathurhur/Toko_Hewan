@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
-                    <form action="{{ route('user.animals.update', $animal->id) }}" method="POST" enctype="multipart/form-data">
+                   <form action="{{ auth()->user()->role === 'admin' ? route('admin.animals.update', $animal->id) : route('user.animals.update', $animal->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 

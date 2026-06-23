@@ -2,6 +2,12 @@
 
 namespace App\Models;
 
+/**
+ * @property string $role
+ * @property \Illuminate\Support\Carbon|null $last_seen
+ * @method static \Illuminate\Database\Eloquent\Builder where(string $column, mixed $operator = null, mixed $value = null)
+ * @method static \Illuminate\Database\Eloquent\Builder latest(string $column = null)
+ */
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +28,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'whatsapp_number', // Tambahan baru
+        'whatsapp_number',
+        'last_seen',
     ];
 
     /**
@@ -35,21 +42,27 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'last_seen' => 'datetime',
+    ];
 
 
     public function animals()
     {
         return $this->hasMany(Animal::class);
+    }
+
+    /**
+     * Helper to query by role explicitly (static for analyzer friendliness).
+     */
+    public static function role(string $role)
+    {
+        return static::where('role', $role);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Animal;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AnimalController extends Controller
 {
@@ -52,8 +51,14 @@ class AnimalController extends Controller
             'image'         => 'required|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
         ]);
 
-        // 2. Simpan gambar ke folder 'storage/app/public/animals'
-        $imagePath = $request->file('image')->store('animals', 'public');
+        // 2. Simpan gambar LANGSUNG ke folder public/uploads/animals
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/animals'), $imageName);
+            $imagePath = 'uploads/animals/' . $imageName;
+        }
 
         // 3. Simpan data ke database (Otomatis terkait dengan user yang sedang login)
         auth()->user()->animals()->create([
@@ -123,18 +128,25 @@ class AnimalController extends Controller
 
         // 3. Jika user mengupload gambar baru
         if ($request->hasFile('image')) {
-            // Hapus gambar lama dari server agar tidak menumpuk
-            if ($animal->image_path) {
-                Storage::disk('public')->delete($animal->image_path);
+            // Hapus gambar lama dari folder public agar hard disk tidak penuh
+            if ($animal->image_path && file_exists(public_path($animal->image_path))) {
+                unlink(public_path($animal->image_path));
             }
-            // Simpan gambar baru
-            $data['image_path'] = $request->file('image')->store('animals', 'public');
+
+            // Simpan gambar baru langsung ke public
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('uploads/animals'), $imageName);
+            $data['image_path'] = 'uploads/animals/' . $imageName;
         }
 
         // 4. Update data ke database
         $animal->update($data);
 
-        // 5. Kembali ke dashboard dengan pesan sukses
+        // 5. Kembali ke dashboard dengan pesan sukses (Cek siapa yang sedang login)
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard')->with('success', 'Tindakan Admin: Data hewan berhasil diperbarui!');
+        }
         return redirect()->route('user.animals.index')->with('success', 'Data hewan berhasil diperbarui!');
     }
 
@@ -151,15 +163,21 @@ class AnimalController extends Controller
             abort(403, 'Anda tidak memiliki akses untuk menghapus hewan ini.');
         }
 
-        // Hapus file gambar dari folder penyimpanan agar hard disk tidak penuh
-        if ($animal->image_path) {
-            Storage::disk('public')->delete($animal->image_path);
+        // Hapus file gambar dari folder public agar hard disk tidak penuh
+        if ($animal->image_path && file_exists(public_path($animal->image_path))) {
+            unlink(public_path($animal->image_path));
         }
 
         // Hapus data dari database
         $animal->delete();
 
+        // Hapus data dari database
+        $animal->delete();
+
         // Kembalikan ke halaman index dengan pesan sukses
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard')->with('success', 'Tindakan Admin: Hewan nakal berhasil dihapus paksa!');
+        }
         return redirect()->route('user.animals.index')->with('success', 'Data hewan berhasil dihapus secara permanen!');
     }
 }
