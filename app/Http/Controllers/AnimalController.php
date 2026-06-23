@@ -55,15 +55,19 @@ class AnimalController extends Controller
             'image'         => 'required|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
         ]);
 
-        // 2. Simpan gambar ke storage/app/public/animals menggunakan Storage facade
+        // 2. Simpan gambar LANGSUNG ke folder public/uploads/animals
         $imagePath = null;
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            // Simpan file dan dapatkan path relatif terhadap storage/app/public
-            $path = Storage::disk('public')->putFileAs('animals', $image, $imageName);
-            // Path yang disimpan adalah 'animals/filename' (tanpa 'storage/' prefix)
-            $imagePath = $path;
+
+            // Membuat nama file yang aman (menghapus spasi agar link tidak rusak)
+            $imageName = time() . '_' . str_replace(' ', '_', $image->getClientOriginalName());
+
+            // Perintah ini memindahkan file fisik ke folder public/uploads/animals
+            $image->move(public_path('uploads/animals'), $imageName);
+
+            // Hanya simpan nama filenya saja ke database
+            $imagePath = $imageName;
         }
 
         // 3. Simpan data ke database (Otomatis terkait dengan user yang sedang login)
@@ -141,16 +145,17 @@ class AnimalController extends Controller
 
         // 3. Jika user mengupload gambar baru
         if ($request->hasFile('image')) {
-            // Hapus gambar lama dari storage agar hard disk tidak penuh
-            if ($animal->image_path && Storage::disk('public')->exists($animal->image_path)) {
-                Storage::disk('public')->delete($animal->image_path);
+            // Hapus gambar fisik yang lama dari folder public
+            if ($animal->image_path && file_exists(public_path('uploads/animals/' . $animal->image_path))) {
+                unlink(public_path('uploads/animals/' . $animal->image_path));
             }
 
-            // Simpan gambar baru ke storage/app/public/animals
+            // Simpan gambar baru LANGSUNG ke public/uploads/animals
             $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $path = Storage::disk('public')->putFileAs('animals', $image, $imageName);
-            $data['image_path'] = $path;
+            $imageName = time() . '_' . str_replace(' ', '_', $image->getClientOriginalName());
+            $image->move(public_path('uploads/animals'), $imageName);
+
+            $data['image_path'] = $imageName;
         }
 
         // 4. Update data ke database
@@ -176,9 +181,9 @@ class AnimalController extends Controller
             abort(403, 'Anda tidak memiliki akses untuk menghapus hewan ini.');
         }
 
-        // Hapus file gambar dari storage agar hard disk tidak penuh
-        if ($animal->image_path && Storage::disk('public')->exists($animal->image_path)) {
-            Storage::disk('public')->delete($animal->image_path);
+        // Hapus file fisik gambar dari folder public agar hard disk tidak penuh
+        if ($animal->image_path && file_exists(public_path('uploads/animals/' . $animal->image_path))) {
+            unlink(public_path('uploads/animals/' . $animal->image_path));
         }
 
         // Hapus data dari database

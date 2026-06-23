@@ -27,7 +27,7 @@
             @forelse ($animals as $animal)
                 <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
                     <div class="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
-                        <img src="{{ asset('storage/' . $animal->image_path) }}" alt="{{ $animal->name }}" class="w-full h-full object-cover">
+                        <img src="{{ asset('upload/animals/' . $animal->image_path) }}" alt="{{ $animal->name }}" class="w-full h-full object-cover">
                     </div>
 
                     <div class="p-4">

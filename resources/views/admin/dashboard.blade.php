@@ -33,7 +33,7 @@
                                 <tr class="border-b hover:bg-gray-50 items-center">
                                     <td class="px-6 py-2">
                                         @if($animal->image_path)
-                                            <img src="{{ asset('storage/' . $animal->image_path) }}" alt="Foto" class="w-16 h-16 object-cover rounded shadow-sm border border-gray-200">
+                                            <img src="{{ asset('upload/animals/' . $animal->image_path) }}" alt="Foto" class="w-16 h-16 object-cover rounded shadow-sm border border-gray-200">
                                         @else
                                             <div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded border border-gray-200 text-xs text-gray-400">No Pic</div>
                                         @endif
