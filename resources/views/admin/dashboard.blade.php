@@ -80,8 +80,8 @@
                         <table class="w-full text-sm text-left text-gray-500">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3">Nama</th>
-                                    <th class="px-6 py-3">Email</th>
+                                    <th class="px-6 py-3 text-left w-1/3">Nama</th>
+                                    <th class="px-6 py-3 text-left">Email</th>
                                 </tr>
                             </thead>
                             <tbody>
