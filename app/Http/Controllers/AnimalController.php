@@ -48,9 +48,9 @@ class AnimalController extends Controller
             'name'          => 'required|string|max:255',
             'species'       => 'required|string|max:255',
             'gender'        => 'required|in:Jantan,Betina',
-            'weight'        => 'required|numeric',
+            'weight'        => 'required|numeric|min:0',
             'estimated_age' => 'required|string|max:50',
-            'price'         => 'required|numeric',
+            'price'         => 'required|string|regex:/^[0-9.,]+$/',
             'description'   => 'required|string',
             'image'         => 'required|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
         ]);
@@ -70,7 +70,10 @@ class AnimalController extends Controller
             $imagePath = $imageName;
         }
 
-        // 3. Simpan data ke database (Otomatis terkait dengan user yang sedang login)
+        // 3. Normalize price: hapus pemisah ribuan dan konversi ke integer
+        $price = (int) preg_replace('/[^0-9]/', '', $request->price);
+
+        // 4. Simpan data ke database (Otomatis terkait dengan user yang sedang login)
         auth()->user()->animals()->create([
             'image_path'    => $imagePath,
             'name'          => $request->name,
@@ -78,7 +81,7 @@ class AnimalController extends Controller
             'gender'        => $request->gender,
             'weight'        => $request->weight,
             'estimated_age' => $request->estimated_age,
-            'price'         => $request->price,
+            'price'         => $price,
             'description'   => $request->description,
             'is_public'     => 1, // <--- TAMBAHKAN BARIS INI AGAR OTOMATIS "TERSEDIA"
         ]);
@@ -132,9 +135,9 @@ class AnimalController extends Controller
             'name'          => 'required|string|max:255',
             'species'       => 'required|string|max:255',
             'gender'        => 'required|in:Jantan,Betina',
-            'weight'        => 'required|numeric',
+            'weight'        => 'required|numeric|min:0',
             'estimated_age' => 'required|string|max:50',
-            'price'         => 'required|numeric',
+            'price'         => 'required|string|regex:/^[0-9.,]+$/',
             'description'   => 'required|string',
             'is_public'     => 'required|boolean', // Validasi status tampil/terjual
             'image'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -158,7 +161,10 @@ class AnimalController extends Controller
             $data['image_path'] = $imageName;
         }
 
-        // 4. Update data ke database
+        // 4. Normalize price: hapus pemisah ribuan dan konversi ke integer
+        $data['price'] = (int) preg_replace('/[^0-9]/', '', $data['price']);
+
+        // 5. Update data ke database
         $animal->update($data);
 
         // 5. Kembali ke dashboard dengan pesan sukses (Cek siapa yang sedang login)

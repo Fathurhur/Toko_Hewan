@@ -47,26 +47,25 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div class="mb-4">
                                 <label class="block text-gray-700 font-bold mb-2">Harga (Rp)</label>
-                                <input type="number" name="price" value="{{ $animal->price }}" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                                <input type="text" name="price" value="{{ number_format($animal->price, 0, ',', '.') }}" class="w-full border-gray-300 rounded-md shadow-sm price-input" required>
                             </div>
 
                             <div class="mb-4">
-                                <label class="block text-gray-700 font-bold mb-2">Status Penjualan</label>
-                                <select name="is_public" class="w-full border-gray-300 rounded-md shadow-sm text-blue-700 font-bold" required>
-                                    <option value="1" {{ $animal->is_public == 1 ? 'selected' : '' }}>Tersedia</option>
-                                    <option value="0" {{ $animal->is_public == 0 ? 'selected' : '' }}>Terjual</option>
-                                </select>
-                            </div>
+                            <label class="block text-gray-700 font-bold mb-2">Status Penjualan</label>
+                            <select name="is_public" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                                <option value="1" {{ $animal->is_public == 1 ? 'selected' : '' }}>Tersedia</option>
+                                <option value="0" {{ $animal->is_public == 0 ? 'selected' : '' }}>Kosong</option>
+                            </select>
                         </div>
 
                         <div class="mb-4">
                             <label class="block text-gray-700 font-bold mb-2">Deskripsi Lengkap</label>
-                            <textarea name="description" rows="4" class="w-full border-gray-300 rounded-md shadow-sm" required>{{ $animal->description }}</textarea>
+                            <textarea name="description" rows="4" class="w-full border-gray-300 rounded-md shadow-sm" required>{{ old('description', $animal->description) }}</textarea>
                         </div>
 
                         <div class="mb-4 p-4 border rounded bg-gray-50">
                             <label class="block text-gray-700 font-bold mb-2">Foto Saat Ini:</label>
-                            <img src="{{ asset('storage/' . $animal->image_path) }}" alt="Foto" class="h-32 mb-4 rounded">
+                            <img src="{{ asset('uploads/animals/' . $animal->image_path) }}" alt="Foto" class="h-32 mb-4 rounded">
 
                             <label class="block text-gray-700 font-bold mb-2">Ganti Foto (Kosongkan jika tidak ingin ganti)</label>
                             <input type="file" name="image" accept="image/*" class="w-full border-gray-300">
@@ -77,6 +76,22 @@
                             <a href="{{ route('user.animals.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600">Batal</a>
                         </div>
                     </form>
+
+                    <script>
+                        // Format price input saat user mengetik
+                        document.querySelector('.price-input').addEventListener('input', function(e) {
+                            let value = e.target.value.replace(/\D/g, ''); // Hapus semua karakter bukan angka
+                            if (value) {
+                                e.target.value = new Intl.NumberFormat('id-ID').format(value);
+                            }
+                        });
+
+                        // Normalize price sebelum submit (hapus formatting)
+                        document.querySelector('form').addEventListener('submit', function(e) {
+                            let priceInput = document.querySelector('.price-input');
+                            priceInput.value = priceInput.value.replace(/\D/g, ''); // Hanya simpan angka
+                        });
+                    </script>
 
                 </div>
             </div>

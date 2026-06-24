@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Daftar Semua Hewan - Admin') }}
+            {{ __('Daftar Hewan Dagangan Saya') }}
         </h2>
     </x-slot>
 
@@ -14,66 +14,53 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 border-b">
-                    <h3 class="text-lg font-bold mb-4">Daftar Hewan yang Dijual (Edit/Hapus)</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-500">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3">Foto</th>
-                                    <th class="px-6 py-3">Nama Hewan</th>
-                                    <th class="px-6 py-3">Jenis</th>
-                                    <th class="px-6 py-3">Penjual</th>
-                                    <th class="px-6 py-3">Harga</th>
-                                    <th class="px-6 py-3">Status</th>
-                                    <th class="px-6 py-3 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($animals as $animal)
-                                <tr class="border-b hover:bg-gray-50 items-center">
-                                    <td class="px-6 py-2">
-                                        @if($animal->image_path)
-                                            <img src="{{ asset('storage/' . $animal->image_path) }}" alt="Foto" class="w-16 h-16 object-cover rounded shadow-sm border border-gray-200">
-                                        @else
-                                            <div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded border border-gray-200 text-xs text-gray-400">No Pic</div>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 font-medium text-gray-900">{{ $animal->name }}</td>
-                                    <td class="px-6 py-4">{{ $animal->species }}</td>
-                                    <td class="px-6 py-4 font-bold text-blue-600">{{ $animal->user->name }}</td>
-                                    <td class="px-6 py-4 font-bold text-green-600">Rp {{ number_format($animal->price, 0, ',', '.') }}</td>
-                                    <td class="px-6 py-4 font-semibold {{ $animal->is_public ? 'text-green-600' : 'text-red-500' }}">
-                                        {{ $animal->is_public ? 'Tersedia' : 'Kosong' }}
-                                    </td>
+            <div class="mb-6">
+                <a href="{{ route('user.animals.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">
+                    + Tambah Hewan Baru
+                </a>
+            </div>
 
-                                    <td class="px-6 py-4">
-                                        <div class="flex gap-2 justify-center">
-                                            <a href="{{ route('admin.animals.edit', $animal->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
-                                                Edit
-                                            </a>
-                                            <form action="{{ route('admin.animals.destroy', $animal->id) }}" method="POST" onsubmit="return confirm('TINDAKAN ADMIN: Yakin ingin menghapus paksa hewan ini dari marketplace?');" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                                        Belum ada hewan yang dijual.
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-start">
+                @forelse ($animals as $animal)
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+                        <div class="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                            <img src="{{ asset('uploads/animals/' . $animal->image_path) }}" alt="{{ $animal->name }}" class="w-full h-full object-cover">
+                        </div>
+
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg mb-1 text-gray-900 leading-tight">{{ $animal->name }}</h3>
+                            <p class="text-gray-600 text-xs mb-1"><strong>Jenis:</strong> {{ $animal->species }} ({{ $animal->gender }})</p>
+                            <p class="text-gray-600 text-xs mb-1"><strong>Usia:</strong> {{ $animal->estimated_age }} | <strong>Berat:</strong> {{ $animal->weight }} Kg</p>
+                            <p class="text-green-600 font-bold text-lg mt-2">Rp {{ number_format($animal->price, 0, ',', '.') }}</p>
+
+                            <p class="text-xs mt-1 font-semibold {{ $animal->is_public ? 'text-green-600' : 'text-red-500' }}">
+                                Status: {{ $animal->is_public ? 'Tersedia' : 'Kosong' }}
+                            </p>
+
+                            <p class="text-gray-700 text-sm mt-3 pt-3 border-t border-gray-200 italic" title="{{ $animal->description }}">
+                                "{{ \Illuminate\Support\Str::limit($animal->description, 60, '...') }}"
+                            </p>
+
+                            <div class="mt-4 flex gap-2">
+                                <a href="{{ route('user.animals.edit', $animal->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1.5 rounded text-xs flex-1 font-semibold transition text-center flex items-center justify-center">
+                                    Edit
+                                </a>
+
+                                <form action="{{ route('user.animals.destroy', $animal->id) }}" method="POST" class="flex-1" onsubmit="return confirm('Apakah Anda yakin ingin menghapus hewan ini permanen?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-full h-full bg-red-600 hover:bg-red-700 text-white px-2 py-1.5 rounded text-xs font-semibold transition text-center">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                @empty
+                    <div class="col-span-full bg-white p-6 rounded-lg shadow-md text-center text-gray-500">
+                        Belum ada hewan yang Anda jual. Silakan tambah hewan baru!
+                    </div>
+                @endforelse
             </div>
 
         </div>

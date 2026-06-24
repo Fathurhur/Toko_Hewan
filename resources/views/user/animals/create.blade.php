@@ -45,7 +45,7 @@
 
                         <div class="mb-4">
                             <label class="block text-gray-700 font-bold mb-2">Harga (Rp)</label>
-                            <input type="number" name="price" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                            <input type="text" name="price" placeholder="Contoh: 200000" class="w-full border-gray-300 rounded-md shadow-sm price-input" required>
                         </div>
 
                         <div class="mb-4">
@@ -62,6 +62,22 @@
                             <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">Simpan Data</button>
                         </div>
                     </form>
+
+                    <script>
+                        // Format price input saat user mengetik
+                        document.querySelector('.price-input').addEventListener('input', function(e) {
+                            let value = e.target.value.replace(/\D/g, ''); // Hapus semua karakter bukan angka
+                            if (value) {
+                                e.target.value = new Intl.NumberFormat('id-ID').format(value);
+                            }
+                        });
+
+                        // Normalize price sebelum submit (hapus formatting)
+                        document.querySelector('form').addEventListener('submit', function(e) {
+                            let priceInput = document.querySelector('.price-input');
+                            priceInput.value = priceInput.value.replace(/\D/g, ''); // Hanya simpan angka
+                        });
+                    </script>
 
                 </div>
             </div>

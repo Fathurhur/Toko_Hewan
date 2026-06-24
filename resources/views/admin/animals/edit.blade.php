@@ -67,7 +67,7 @@
                         <div class="mb-4 p-4 border rounded bg-gray-50">
                             <label class="block text-gray-700 font-bold mb-2">Foto Saat Ini:</label>
                             @if($animal->image_path)
-                                <img src="{{ asset('storage/' . $animal->image_path) }}" alt="Foto" class="h-32 mb-4 rounded border border-gray-300">
+                                <img src="{{ asset('uploads/animals/' . $animal->image_path) }}" alt="Foto" class="h-32 mb-4 rounded border border-gray-300">
                             @else
                                 <div class="h-32 mb-4 rounded border border-gray-300 bg-gray-100 flex items-center justify-center text-gray-400">No Image</div>
                             @endif

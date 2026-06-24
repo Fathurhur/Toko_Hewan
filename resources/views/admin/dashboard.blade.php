@@ -16,7 +16,7 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 border-b">
-                    <h3 class="text-lg font-bold mb-4">Daftar Hewan yang Dijual (Moderasi)</h3>
+                    <h3 class="text-lg font-bold mb-4">Daftar Hewan yang Dijual pedagang</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left text-gray-500">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
@@ -25,15 +25,18 @@
                                     <th class="px-6 py-3">Nama Hewan</th>
                                     <th class="px-6 py-3">Jenis</th>
                                     <th class="px-6 py-3">Penjual</th>
+                                    <th class="px-6 py-3">Harga</th>
                                     <th class="px-6 py-3">Status</th>
-                                    <th class="px-6 py-3 text-center">Aksi</th> </tr>
+                                    <th class="px-6 py-3 text-left w-1/4">Deskripsi</th>
+                                    <th class="px-6 py-3 text-center">Aksi</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 @foreach($animals as $animal)
                                 <tr class="border-b hover:bg-gray-50 items-center">
                                     <td class="px-6 py-2">
                                         @if($animal->image_path)
-                                            <img src="{{ asset('upload/animals/' . $animal->image_path) }}" alt="Foto" class="w-16 h-16 object-cover rounded shadow-sm border border-gray-200">
+                                            <img src="{{ asset('uploads/animals/' . $animal->image_path) }}" alt="Foto" class="w-16 h-16 object-cover rounded shadow-sm border border-gray-200">
                                         @else
                                             <div class="w-16 h-16 bg-gray-100 flex items-center justify-center rounded border border-gray-200 text-xs text-gray-400">No Pic</div>
                                         @endif
@@ -41,11 +44,14 @@
                                     <td class="px-6 py-4 font-medium text-gray-900">{{ $animal->name }}</td>
                                     <td class="px-6 py-4">{{ $animal->species }}</td>
                                     <td class="px-6 py-4 font-bold text-blue-600">{{ $animal->user->name }}</td>
+                                    <td class="px-6 py-4 font-bold text-green-600">Rp {{ number_format($animal->price, 0, ',', '.') }}</td>
                                     <td class="px-6 py-4 font-semibold {{ $animal->is_public ? 'text-green-600' : 'text-red-500' }}">
                                         {{ $animal->is_public ? 'Tersedia' : 'Kosong' }}
                                     </td>
-
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 text-xs text-gray-600 text-left align-middle break-words">
+                                        {{ \Illuminate\Support\Str::limit($animal->description, 60, '...') }}
+                                    </td>
+                                    <td class="px-6 py-4 align-middle">
                                         <div class="flex gap-2 justify-center">
                                             <a href="{{ route('admin.animals.edit', $animal->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
                                                 Edit
@@ -76,23 +82,13 @@
                                 <tr>
                                     <th class="px-6 py-3">Nama</th>
                                     <th class="px-6 py-3">Email</th>
-                                    <th class="px-6 py-3">Status</th>
-                                    <th class="px-6 py-3">Terakhir Aktif</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($sellers as $seller)
-                                    @php $isOnline = $seller->last_seen && $seller->last_seen >= now()->subMinutes(5); @endphp
                                 <tr class="border-b hover:bg-gray-50">
                                     <td class="px-6 py-4 font-medium text-gray-900">{{ $seller->name }}</td>
                                     <td class="px-6 py-4">{{ $seller->email }}</td>
-                                    <td class="px-6 py-4">
-                                        @if($isOnline) <span class="text-green-600 font-bold">Online</span>
-                                        @else <span class="text-gray-500">Offline</span> @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-xs italic">
-                                        {{ $seller->last_seen ? $seller->last_seen->diffForHumans() : 'Belum login' }}
-                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>

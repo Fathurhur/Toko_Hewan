@@ -24,7 +24,7 @@
                 @forelse ($animals as $animal)
                     <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
                         <div class="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
-                            <img src="{{ asset('upload/animals/' . $animal->image_path) }}" alt="{{ $animal->name }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('uploads/animals/' . $animal->image_path) }}" alt="{{ $animal->name }}" class="w-full h-full object-cover">
                         </div>
 
                         <div class="p-4">
@@ -33,8 +33,12 @@
                             <p class="text-gray-600 text-xs mb-1"><strong>Usia:</strong> {{ $animal->estimated_age }} | <strong>Berat:</strong> {{ $animal->weight }} Kg</p>
                             <p class="text-green-600 font-bold text-lg mt-2">Rp {{ number_format($animal->price, 0, ',', '.') }}</p>
 
-                            <p class="text-xs mt-2 font-semibold {{ $animal->is_public ? 'text-green-600' : 'text-red-500' }}">
-                                Status: {{ $animal->is_public ? 'Tersedia' : 'Terjual' }}
+                            <p class="text-xs mt-1 font-semibold {{ $animal->is_public ? 'text-green-600' : 'text-red-500' }}">
+                                Status: {{ $animal->is_public ? 'Tersedia' : 'Kosong' }}
+                            </p>
+
+                            <p class="text-gray-700 text-sm mt-3 pt-3 border-t border-gray-200 italic">
+                                "{{ \Illuminate\Support\Str::limit($animal->description, 60, '...') }}"
                             </p>
 
                             <div class="mt-4 flex gap-2">

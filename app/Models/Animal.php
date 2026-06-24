@@ -28,6 +28,14 @@ class Animal extends Model
     ];
 
     /**
+     * Type casting untuk price (integer rupiah) dan weight
+     */
+    protected $casts = [
+        'price' => 'integer',
+        'weight' => 'decimal:2',
+    ];
+
+    /**
      * Relasi kembali ke model User (Setiap hewan dimiliki oleh satu user)
      */
     public function user()
